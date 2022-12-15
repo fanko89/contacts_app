@@ -1,74 +1,89 @@
-let outputText = document.getElementById('outputText')
-console.log()
+// Create an empty array to store the contacts
+let contacts = []
+
+let output = document.querySelector(".output")
+let addContact = document.querySelector(".addContact")
+let name = document.querySelector(".name")
+let phone = document.querySelector(".phone")
+let email = document.querySelector(".phone")
+let text = document.querySelector(".text")
+let deleteContact = document.querySelector(".deleteContact")
 
 
 
+addContact.onclick = () => {
+  let todoText = todoInput.value;
+  let todoData = localStorage.getItem("TodoLocalStorage");
+
+  // determine category
+  let categoryIndex = selectCategoryList.selectedIndex
+  let category = undefined
+  if (categoryIndex !== 0) {
+    category = selectCategoryList.value
+  }
+  if (todoData == null) {
+    todos = []; 
+  } else {
+    todos = JSON.parse(todoData); 
+  }
+
+  if (todoText === "") {
+    console.error("no empty text allowed");
+  } else {
+    todos.push({text: todoText, completed: false, category});
+    localStorage.setItem("TodoLocalStorage", JSON.stringify(todos));
+    renderTodos();
+    addBtn.classList.remove("active");
+  }
+  todoInput.value = "";
+};
 
 
-//rendering task
-function rendercontacts() {
-    editCategoryInput.hidden = true
-    let contactData = localStorage.getItem("contactsLocalStorage");
-    console.table(contactData)
-    if (contactData == null) {
-      textOutput = [];
-    } else {
-      contacts = JSON.parse(contactsData);
-    }
-    const pendingTasksNumb = document.querySelector(".tasksLeft");
-    pendingTasksNumb.textContent = contacts.length;
-    if (contacts.length > 0) {
-      clearBtn.classList.add("active"); 
-    } else {
-      clearBtn.classList.remove("active"); 
-    }
-    let newLiTag = "";
-    contacts.forEach((element, index) => {
-  
-      if (element.category === filterByCategory || filterByCategory === undefined || refreshCategories) {
-        if (element.editing) {
-          newLiTag += `<li><input type="text" class="editcontacts"  placeholder=${element.text}><span class="icon" onclick="updatecontacts(${index})"><i class="fa-solid fa-check"></i></span></li>`;
-        } else if (element.completed) {
-          newLiTag += `<li onclick="completecontacts(${index})"><s>${element.text} ${element.category ? `(${element.category})` : ""}</s><span class="icon" onclick="deletecontacts(${index})"><i class="fas fa-trash"></i></span></li>`;
-        } else {
-          newLiTag += `<li onclick="completecontacts(${index})">${element.text} ${element.category ? `(${element.category})` : ""}<span class="icon" onclick="editcontacts(${index})"><i class="fas fa-edit"></i></span></li>`;
-        }
-      }
-    });
-    contactsList.innerHTML = newLiTag;
-    if (refreshCategories) {
-      renderCategories()
-    }
-  } 
+// Create a function to add a new contact to the array
+function addContact() {
+  // Get the values of the input fields
 
-  // delete function
-function deleteContact(index) {
-  let contactsData = localStorage.getItem("contactsLocalStorage");
-  contacts = JSON.parse(contactsData);
-  if (contacts[index].completed) {
-    contacts.splice(index, 1);
-    localStorage.setItem("contactsLocalStorage", JSON.stringify(contacts));
-    rendercontacts();
+
+  name = name.toLowerCase();
+  phone = phone.toLowerCase();
+  text = text.toLowerCase();
+
+   // Create a unique ID for the contact
+   let id = "contact" + (Object.keys(contacts).length + 1);
+
+  // Create an object to store the contact information
+  let contact = {
+    name: name,
+    phone: phone,
+    email: email,
+    text: text,
   }
 }
 
 
-// change UI to show edit around the contacts
-function updatecontacts(id) {
-  const text = document.querySelector(".editcontacts").value
-  contacts[id].editing = false
-  contacts[id].text = text
-  contacts[id].completed = false
-  localStorage.setItem("contactsLocalStorage", JSON.stringify(contacts));
-  rendercontacts()
+// Create a function to display the selected contact
+function renderContacts() {
+  // Get the name of the selected contact from the dropdown menu
+  let name = document.getElementById("contactSelect").value
+
+  // Find the contact object in the contacts array that has the selected name
+  let contact = contacts.find((contactID) => contactID.name === name)
+
+  // Display the contact information
+  document.getElementById("displayName").innerHTML = contact.name
+  document.getElementById("displayPhone").innerHTML = contact.phone
+  document.getElementById("displayEmail").innerHTML = contact.email
+  document.getElementById("displayText").innerHTML = contact.text
 }
 
-// delete list
-clearBtn.onclick = () => {
-  contacts = []; 
-  localStorage.setItem("contactsLocalStorage", JSON.stringify(contacts)); 
-  rendercontacts(); 
-};
+// Create a function to delete a contact
+function deleteContact() {
+  // Get the name of the selected contact from the dropdown menu
+  let name = document.getElementById("contact-select").value
 
-// initial render
-rendercontacts();
+  // Find the index of the contact object in the contacts array that has the selected name
+  let index = contacts.findIndex((contactID) => contactID.name === name)
+
+  // Remove the contact from the contacts array using the index
+  contacts.splice(index, 1)
+}
